@@ -1,0 +1,127 @@
+AuthModule - Аутентификация и авторизация (JWT, роли).
+UsersModule - Управление пользователями и профилями.
+AccountsModule - Дебетовые счета (основа для карт).
+CardsModule - Дебетовые и кредитные карты (привязаны к счетам/кредитам)
+LoansModule - Кредитные продукты и договоры.
+TransactionsModule - Операции по счетам и картам.
+
+
+Условные обозначения:
+- [public] – доступ без аутентификации
+- [auth] – требуется JWT токен (любая роль)
+- [USER] – только пользователи с ролью USER
+- [WORKER] – только сотрудники банка
+- [ADMIN] – только администраторы
+- [USER,WORKER,ADMIN] – доступен всем аутентифицированным с указанными ролями
+
+============================================
+1. АУТЕНТИФИКАЦИЯ И РЕГИСТРАЦИЯ
+============================================
+
+POST   /auth/register               [public]     Регистрация нового пользователя (создаётся User)
+POST   /auth/login                  [public]     Вход, выдача accessToken. При 3 ошибках – блокировка в Redis на 10 мин
+POST   /auth/logout                 [auth]       Выход, добавление токена в чёрный список Redis
+POST   /auth/refresh                [auth]       Обновление accessToken через refreshToken
+GET    /auth/me                     [auth]       Информация о текущем пользователе
+
+============================================
+2. ПРОФИЛЬ CUSTOMER (анкета клиента)
+============================================
+
+POST   /customers/profile           [USER]       Создание анкеты клиента
+GET    /customers/profile           [USER,WORKER,ADMIN]  Получить свой профиль
+GET    /customers/:id               [WORKER,ADMIN]       Получить профиль по ID
+PUT    /customers/profile           [USER]       Обновить свои данные (ФИО, телефон)
+PUT    /customers/:id               [ADMIN]      Обновить данные клиента админом
+DELETE /customers/profile           [USER]       Удалить свой профиль (если нет счетов)
+DELETE /customers/:id               [ADMIN]      Удалить профиль клиента админом
+
+============================================
+3. СЧЕТА (ACCOUNT)
+============================================
+
+POST   /accounts                    [USER]       Открыть новый счёт (требуется Customer и KYC)
+GET    /accounts                    [USER]       Список своих счетов
+GET    /accounts/:id                [USER,WORKER,ADMIN]  Детали счёта
+PUT    /accounts/:id                [WORKER,ADMIN]       Обновить параметры счёта (лимиты)
+DELETE /accounts/:id                [USER,ADMIN]         Закрыть счёт (баланс = 0)
+GET    /accounts/:id/transactions   [USER,WORKER,ADMIN]  История операций по счёту
+
+============================================
+4. ТРАНЗАКЦИИ (TRANSACTION)
+============================================
+
+POST   /transactions/transfer       [USER]       Перевод между своими счетами
+POST   /transactions/send           [USER]       Перевод на другой счёт (по номеру счёта или phone)
+POST   /transactions/deposit        [USER]       Пополнение счёта (имитация)
+POST   /transactions/withdraw       [WORKER]     Снятие наличных (требует сотрудника)
+GET    /transactions                [USER]       Список своих транзакций с фильтрацией
+GET    /transactions/:id            [USER,WORKER,ADMIN]  Детали транзакции
+GET    /transactions/public/:publicId  [WORKER,ADMIN]    Поиск по публичному ID
+
+============================================
+5. КРЕДИТЫ (LOAN)
+============================================
+
+POST   /loans/apply                 [USER]       Подать заявку на кредит (требуется счёт)
+GET    /loans                       [USER]       Список своих кредитов
+GET    /loans/:id                   [USER,WORKER,ADMIN]  Детали кредита
+PUT    /loans/:id/approve           [WORKER,ADMIN]       Одобрить заявку (создать Loan)
+PUT    /loans/:id/reject            [WORKER,ADMIN]       Отклонить заявку
+POST   /loans/:id/payment           [USER]       Внести платёж по кредиту
+GET    /loans/:id/schedule          [USER,WORKER,ADMIN]  График платежей
+
+============================================
+6. АДМИНИСТРИРОВАНИЕ
+============================================
+
+GET    /admin/users                 [ADMIN]      Список всех пользователей (пагинация)
+PUT    /admin/users/:id/role        [ADMIN]      Изменить роль пользователя
+POST   /admin/users/:id/block       [ADMIN]      Заблокировать пользователя (Redis blacklist)
+POST   /admin/users/:id/unblock     [ADMIN]      Разблокировать пользователя
+GET    /admin/statistics/basic      [ADMIN]      Базовая статистика (кол-во пользователей, счетов и т.д.)
+GET    /admin/logs                  [ADMIN,WORKER]  Просмотр системных логов (MongoDB)
+
+============================================
+7. ЛОГИРОВАНИЕ И ОТЧЁТЫ (MongoDB Aggregation)
+============================================
+
+GET    /logs/user-actions           [ADMIN,WORKER]  Логи действий пользователей (фильтр)
+GET    /logs/errors                 [ADMIN]         Логи ошибок и исключений
+GET    /logs/db-queries             [ADMIN]         Логи запросов к реляционной БД
+GET    /reports/activity            [ADMIN,WORKER]  Статистика активности (день/неделя/месяц)
+GET    /reports/top-active          [ADMIN,WORKER]  ТОП-10 самых активных пользователей
+GET    /reports/operations-distribution [ADMIN]     Распределение операций по типам (CRUD)
+GET    /reports/time-trends         [ADMIN]         Временные тренды (time series)
+GET    /reports/anomalies           [ADMIN]         Аномалии в поведении пользователей
+GET    /reports/export              [ADMIN,WORKER]  Экспорт отчёта (параметры: format=json/csv, reportType)
+
+============================================
+8. КЭШИРОВАНИЕ И REDIS (управление кэшем)
+============================================
+
+DELETE /cache/users                 [ADMIN]      Инвалидировать кэш списка пользователей и ролей
+DELETE /cache/catalogs              [ADMIN]      Инвалидировать кэш справочников
+DELETE /cache/analytics             [ADMIN]      Сбросить кэш аналитических запросов
+DELETE /cache/all                   [ADMIN]      Полная очистка кэша (кроме сессий)
+GET    /cache/stats                 [ADMIN]      Статистика Redis (hit/miss, TTL)
+
+============================================
+9. СЕССИИ И PUB/SUB (лабораторная работа)
+============================================
+
+GET    /sessions                    [USER,ADMIN]   Список активных сессий (админ – всех, пользователь – свои)
+DELETE /sessions/:id                [USER,ADMIN]   Принудительное завершение сессии
+POST   /notifications/publish       [ADMIN,WORKER] Отправить уведомление через pub/sub (всем клиентам)
+GET    /notifications/subscribe     [auth]         WebSocket endpoint для подписки на уведомления
+
+============================================
+10. ТЕХНИЧЕСКИЕ / СЛУЖЕБНЫЕ
+============================================
+
+GET    /health                      [public]      Проверка состояния БД, Redis, MongoDB
+GET    /metrics                     [ADMIN]       Метрики для Prometheus
+
+============================================
+КОНЕЦ СПИСКА
+============================================

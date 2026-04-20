@@ -36,13 +36,18 @@ async function bootstrap() {
   app.useGlobalFilters(new ValidationExceptionFilter());
 
   const config = new DocumentBuilder()
-    .setTitle('My API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build()
+  .setTitle('Bank API')
+  .setDescription('Bank application API')
+  .setVersion('1.0')
+  .addBearerAuth()
+  .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, 
+    },
+  });
   
   await app.listen(envConfig.port);
   console.log(`Server running on http://localhost:${envConfig.port}`);

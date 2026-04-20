@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../app/auth/useAuthStore";
 import { colors } from "../../styles/colors";
+import { theme } from "../../styles/Theme";
 import { login } from "../../app/auth/authService";
 
 export function LoginPage() {
@@ -24,98 +25,151 @@ export function LoginPage() {
       setUser(user);
       navigate("/");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Ошибка входа"
-      );
+      setError(err instanceof Error ? err.message : "Ошибка входа");
     }
   };
 
   return (
     <div
-      className="flex min-h-screen items-center justify-center bg-gray-50"
-      style={{ fontFamily: "system-ui, sans-serif" }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        backgroundColor: "#edf2f7", // bg-blue-50
+      }}
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full rounded-lg bg-white p-6 shadow-lg"
         style={{
-          maxWidth: "28rem",
-          border: `1px solid ${colors.gray200}`,
+          width: "400px",
+          padding: "32px",
+          backgroundColor: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <h1 className="mb-6 text-2xl font-bold">
-          Вход в интернет‑банк
-        </h1>
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: colors.primaryDark }}>
+            Вход в интернет‑банк
+          </h1>
+        </div>
 
-        <div className="mb-4">
+        {error && (
+          <div style={{
+            padding: "12px",
+            marginBottom: "16px",
+            backgroundColor: colors.danger + "10",
+            border: `1px solid ${colors.danger}`,
+            color: colors.danger,
+            textAlign: "center",
+            fontSize: "13px",
+          }}>
+            {error}
+          </div>
+        )}
+
+        <div>
           <label
-            className="mb-1 block text-sm font-medium text-gray-700"
-            htmlFor="email"
+            style={{
+              display: "block",
+              color: colors.gray800,
+              fontSize: "14px",
+              marginBottom: "8px",
+            }}
           >
             Email
           </label>
           <input
-            id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded border px-3 py-2 outline-none focus:ring-2"
             style={{
-              borderColor: colors.gray300,
-              boxShadow: `0 0 0 3px rgba(0, 102, 204, 0.1)`,
+              display: "block",
+              width: "100%",
+              padding: "12px 12px",
+              border: `1px solid ${colors.gray300}`,
+              borderRadius: "6px",
+              fontSize: "14px",
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(0, 102, 204, 0.1)",
             }}
           />
         </div>
 
-        <div className="mb-4">
+        <div style={{ marginTop: "16px" }}>
           <label
-            className="mb-1 block text-sm font-medium text-gray-700"
-            htmlFor="password"
+            style={{
+              display: "block",
+              color: colors.gray800,
+              fontSize: "14px",
+              marginBottom: "8px",
+            }}
           >
             Пароль
           </label>
           <input
-            id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded border px-3 py-2 outline-none focus:ring-2"
             style={{
-              borderColor: colors.gray300,
-              boxShadow: `0 0 0 3px rgba(0, 102, 204, 0.1)`,
+              display: "block",
+              width: "100%",
+              padding: "12px 12px",
+              border: `1px solid ${colors.gray300}`,
+              borderRadius: "6px",
+              fontSize: "14px",
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(0, 102, 204, 0.1)",
             }}
           />
         </div>
 
-        {error && (
-          <p className="mb-4 text-sm text-red-500">{error}</p>
-        )}
-
         <button
           type="submit"
-          className="w-full rounded px-4 py-2 font-medium text-white"
-          style={{ backgroundColor: colors.primary }}
+          style={{
+            display: "block",
+            width: "100%",
+            marginTop: "24px",
+            padding: "12px 16px",
+            backgroundColor: colors.primary,
+            color: "white",
+            borderRadius: "6px",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: "500",
+          }}
         >
           Войти
         </button>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Нет аккаунта?{" "}
+        <div
+          style={{
+            borderTop: `1px solid ${colors.gray200}`,
+            margin: "24px 0 16px",
+          }}
+        ></div>
+
+        <p style={{ textAlign: "center", fontSize: "13px", color: colors.gray600 }}>
+          <span>Нет аккаунта? </span>
           <Link
             to="/auth/register"
-            className="text-blue-600 hover:underline"
-            style={{ color: colors.primaryDark }}
+            style={{
+              color: colors.primary,
+              fontWeight: "500",
+              textDecoration: "none",
+            }}
           >
             Зарегистрироваться
           </Link>
           <br />
           <Link
             to="/auth/reset-password"
-            className="text-blue-600 hover:underline"
             style={{
-              color: colors.primaryDark,
+              color: colors.primary,
+              fontWeight: "500",
               textDecoration: "none",
             }}
           >

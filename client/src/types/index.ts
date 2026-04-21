@@ -1,10 +1,12 @@
-export type AuthUser = {
+export type UserRole = "USER" | "WORKER" | "ADMIN";
+
+export interface AuthUser {
   id: string;
   email: string;
-  role: "USER" | "WORKER" | "ADMIN";
-  displayName: string;
-};
-
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
 export type LoginCredentials = {
   email: string;
   password: string;

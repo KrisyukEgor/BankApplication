@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { BaseOrmEntity } from 'src/shared/types/base-orm-entity';
+import { BaseOrmEntity } from 'src/shared/domain/types/base-orm-entity';
 import { AccountTypeOrmEntity } from './account-type.orm-entity';
 
 @Entity('accounts')

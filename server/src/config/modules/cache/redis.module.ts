@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
-import { AbstractCacheService } from "src/shared/contracts/cache.service.abstract";
+import { AbstractCacheService } from "src/shared/application/ports/cache.service.abstract";
 import { RedisCacheService } from "src/shared/infrastructure/redis-cache.service";
 
 @Global()

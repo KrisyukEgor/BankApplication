@@ -3,14 +3,16 @@ import { Customer } from "../../domain/entities/customer.entity";
 import { AbstractCustomerRepository } from "../../domain/repositories/customer.repository.abstract";
 import { CreateCustomerInput } from "../dto/input/create-customer.input.dto";
 import { CustomerOutput } from "../dto/output/create-customer.output.dto";
-import { AbstractCurrentUserService } from "../../../../shared/services/current-user.service";
+import { AbstractCurrentUserService } from "../../../../shared/application/ports/current-user.service";
 import {v4 as uuidv4} from 'uuid'
+import { AbstractLogger } from "src/shared/application/ports/logger.abstract";
 
 @Injectable()
 export class CreateCustomerUseCase {
   constructor(
     private readonly customerRepository: AbstractCustomerRepository,
     private readonly currentUser: AbstractCurrentUserService,
+    private readonly logger: AbstractLogger,
   ) {}
 
   async execute(input: CreateCustomerInput): Promise<CustomerOutput> {
@@ -32,6 +34,14 @@ export class CreateCustomerUseCase {
     });
 
     const saved = await this.customerRepository.save(customer);
+
+    await this.logger.info(
+      `Customer profile created for user ${userId}`,
+      'customer',
+      userId,
+      { customerId: saved.id, phone: input.phoneNumber }
+    );
+
     return this.toOutput(saved);
   }
 

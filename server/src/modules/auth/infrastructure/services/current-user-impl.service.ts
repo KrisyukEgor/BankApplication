@@ -1,6 +1,6 @@
 import { Injectable, Scope, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { AbstractCurrentUserService } from 'src/shared/services/current-user.service';
+import { AbstractCurrentUserService } from 'src/shared/application/ports/current-user.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CurrentUserServiceImpl implements AbstractCurrentUserService {

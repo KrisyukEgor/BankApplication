@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS",
+      "args": ["run", "start:dev"],
+      "runtimeExecutable": "npm",
+      "console": "integratedTerminal",
+      "restart": true,
+      "protocol": "inspector",
+      "cwd": "${workspaceFolder}/server"
+    }
+  ]
+}

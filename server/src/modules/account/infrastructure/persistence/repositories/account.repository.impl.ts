@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BaseCrudRepository } from 'src/shared/contracts/base-crud.repository';
+import { BaseCrudRepository } from 'src/shared/application/ports/base-crud.repository';
 import { AbstractAccountRepository } from '../../../domain/repositories/account.repository.abstract';
 import { Account } from '../../../domain/entities/account.entity';
 import { AccountOrmEntity } from '../orm-entities/account.orm-entity';

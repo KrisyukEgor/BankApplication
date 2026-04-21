@@ -6,7 +6,7 @@ import { AbstractLoginAttemptsRepository } from '../../application/ports/login-a
 @Injectable()
 export class RedisLoginAttemptsRepository implements AbstractLoginAttemptsRepository {
   private readonly maxAttempts = 3;
-  private readonly blockTTL: number; 
+  private readonly blockTTL: number = 600; 
 
   constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) {}
 
@@ -22,8 +22,10 @@ export class RedisLoginAttemptsRepository implements AbstractLoginAttemptsReposi
     const key = this.getAttemptsKey(email);
 
     const attempts = await this.redis.incr(key);
-    
-    await this.redis.expire(key, this.blockTTL + 300);
+
+    const ttl = Math.floor(Number(this.blockTTL)) + 300;
+
+    await this.redis.expire(key, ttl);
     return attempts;
   }
 
@@ -46,7 +48,10 @@ export class RedisLoginAttemptsRepository implements AbstractLoginAttemptsReposi
 
   async block(email: string, ttlSeconds: number): Promise<void> {
     const blockKey = this.getBlockKey(email);
-    await this.redis.setex(blockKey, ttlSeconds, '1');
+
+     const finalTtl = Math.floor(Number(ttlSeconds)) || this.blockTTL;
+
+    await this.redis.setex(blockKey, finalTtl, '1');
     await this.resetAttempts(email);
   }
 }

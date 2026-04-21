@@ -1,13 +1,14 @@
 import { Injectable, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { AbstractAccountRepository } from "src/modules/account/domain/repositories/account.repository.abstract";
 import { AbstractCustomerRepository } from "src/modules/customer/domain/repositories/customer.repository.abstract";
-import { AbstractCurrentUserService } from "src/shared/services/current-user.service";
+import { AbstractCurrentUserService } from "src/shared/application/ports/current-user.service";
 import { TransactionDomain } from "../../domain/entities/transaction.entity";
 import { AbstractTransactionStatusRepository } from "../../domain/repositories/transaction-status.repository.abstract";
 import { AbstractTransactionTypeRepository } from "../../domain/repositories/transaction-type.repository.abstract";
 import { AbstractTransactionRepository } from "../../domain/repositories/transaction.repository.abstract";
 import { GetTransactionsInput } from "../dto/input/get-transactions.input.interface";
 import { TransactionOutput } from "../dto/output/transaction.output.dto";
+import { AbstractLogger } from "src/shared/application/ports/logger.abstract"; 
 
 
 @Injectable()
@@ -19,19 +20,28 @@ export class GetTransactionsUseCase {
     private readonly accountRepository: AbstractAccountRepository,
     private readonly customerRepository: AbstractCustomerRepository,
     private readonly currentUser: AbstractCurrentUserService,
+    private readonly logger: AbstractLogger, 
   ) {}
 
   async execute(input: GetTransactionsInput): Promise<TransactionOutput[]> {
     const userId = this.currentUser.getUserId();
     const currentUserRole = this.currentUser.getUserRole();
     const customer = await this.customerRepository.findByUserId(userId);
-    if (!customer && currentUserRole !== 'ADMIN') throw new ForbiddenException('Access denied');
+    
+    if (!customer && currentUserRole !== 'ADMIN') {
+      await this.logger.warn('Get transactions failed: access denied', 'transaction-list', userId);
+      throw new ForbiddenException('Access denied');
+    }
 
     let transactions: TransactionDomain[];
     if (input.accountId) {
       const account = await this.accountRepository.findById(input.accountId);
-      if (!account) throw new NotFoundException('Account not found');
+      if (!account) {
+        await this.logger.warn('Get transactions failed: account not found', 'transaction-list', userId, { accountId: input.accountId });
+        throw new NotFoundException('Account not found');
+      }
       if (currentUserRole !== 'ADMIN' && customer && account.customerId !== customer.id) {
+        await this.logger.warn('Get transactions failed: access denied to account', 'transaction-list', userId, { accountId: account.id });
         throw new ForbiddenException('Not your account');
       }
       transactions = await this.transactionRepository.findByAccountId(input.accountId, input.limit, input.offset);
@@ -41,6 +51,12 @@ export class GetTransactionsUseCase {
       if (!customer) throw new ForbiddenException('Customer not found');
       transactions = await this.transactionRepository.findByCustomerId(customer.id, input.limit, input.offset);
     }
+
+    await this.logger.info('Transactions list retrieved', 'transaction-list', userId, {
+      requestedAccountId: input.accountId,
+      requestedCustomerId: input.customerId,
+      resultCount: transactions.length
+    });
 
     const result: TransactionOutput[] = [];
     for (const tx of transactions) {

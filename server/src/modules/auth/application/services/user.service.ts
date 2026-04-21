@@ -12,7 +12,6 @@ export class UserService {
     if (existing) {
       throw new ConflictException(`User with email ${email} already exists`);
     }
-    
   }
 
   async validateCredentials(email: string, password: string, passwordService: AbstractPasswordService): Promise<User> {

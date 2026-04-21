@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AbstractCustomerRepository } from "../../domain/repositories/customer.repository.abstract";
-import { BaseCrudRepository } from "src/shared/contracts/base-crud.repository";
+import { BaseCrudRepository } from "src/shared/application/ports/base-crud.repository";
 import { CustomerMapper } from "../mappers/customer.mapper";
 import { Customer } from "../../domain/entities/customer.entity";
 import { CustomerOrmEntity } from "./orm-entities/customer.orm-entity";

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BaseCrudRepository } from 'src/shared/contracts/base-crud.repository';
+import { BaseCrudRepository } from 'src/shared/application/ports/base-crud.repository';
 import { AbstractTransactionTypeRepository } from '../../../domain/repositories/transaction-type.repository.abstract';
 import { TransactionType } from '../../../domain/entities/transaction-type.entity';
 import { TransactionTypeOrmEntity } from '../orm-entities/transaction-type.orm-entity';
 import { TransactionTypeMapper } from '../mappers/transaction-type.mapper';
-import { CacheTTL } from 'src/shared/contracts/cache-ttl';
-import { AbstractCacheService } from 'src/shared/contracts/cache.service.abstract';
+import { CacheTTL } from 'src/shared/application/cache-ttl';
+import { AbstractCacheService } from 'src/shared/application/ports/cache.service.abstract';
 
 @Injectable()
 export class TransactionTypeRepository

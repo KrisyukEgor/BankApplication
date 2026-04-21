@@ -1,10 +1,11 @@
 import { Injectable, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { AbstractAccountRepository } from "src/modules/account/domain/repositories/account.repository.abstract";
 import { AbstractCustomerRepository } from "src/modules/customer/domain/repositories/customer.repository.abstract";
-import { AbstractCurrentUserService } from "src/shared/services/current-user.service";
+import { AbstractCurrentUserService } from "src/shared/application/ports/current-user.service";
 import { AbstractTransactionRepository } from "../../domain/repositories/transaction.repository.abstract";
 import { DepositInput } from "../dto/input/deposit.input.dto";
 import { CreateTransactionUseCase } from "./create-transaction.use-case";
+import { AbstractLogger } from "src/shared/application/ports/logger.abstract"; 
 
 @Injectable()
 export class DepositUseCase {
@@ -14,16 +15,27 @@ export class DepositUseCase {
     private readonly currentUser: AbstractCurrentUserService,
     private readonly createTransaction: CreateTransactionUseCase,
     private readonly transactionRepository: AbstractTransactionRepository, 
+    private readonly logger: AbstractLogger, 
   ) {}
 
   async execute(input: DepositInput): Promise<void> {
     const userId = this.currentUser.getUserId();
     const customer = await this.customerRepository.findByUserId(userId);
-    if (!customer) throw new ForbiddenException('Customer profile not found');
+    if (!customer) {
+      await this.logger.warn('Deposit failed: profile not found', 'deposit', userId);
+      throw new ForbiddenException('Customer profile not found');
+    }
 
     const account = await this.accountRepository.findById(input.accountId);
-    if (!account) throw new NotFoundException('Account not found');
-    if (account.customerId !== customer.id) throw new ForbiddenException('Not your account');
+    if (!account) {
+      await this.logger.warn('Deposit failed: account not found', 'deposit', userId, { accountId: input.accountId });
+      throw new NotFoundException('Account not found');
+    }
+    
+    if (account.customerId !== customer.id) {
+      await this.logger.warn('Deposit failed: access denied to account', 'deposit', userId, { accountId: account.id });
+      throw new ForbiddenException('Not your account');
+    }
 
     const transaction = await this.createTransaction.execute({
       toAccountId: account.id,
@@ -35,11 +47,26 @@ export class DepositUseCase {
     try {
       account.deposit(input.amount);
       await this.accountRepository.save(account);
+      
       transaction.complete();
       await this.transactionRepository.save(transaction);
+
+      await this.logger.info('Deposit completed successfully', 'deposit', userId, {
+        accountId: account.id,
+        amount: input.amount,
+        txPublicId: transaction.publicId
+      });
+
     } catch (error) {
       transaction.fail();
       await this.transactionRepository.save(transaction);
+
+      await this.logger.error('Deposit operation failed', error instanceof Error ? error.stack : undefined, 'deposit', {
+        accountId: account.id,
+        amount: input.amount,
+        txPublicId: transaction.publicId
+      });
+
       throw error;
     }
   }

@@ -2,12 +2,12 @@ import { Injectable, Optional } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AbstractUserRepository } from 'src/modules/auth/domain/repositories/user.repository.abstract';
-import { BaseCrudRepository } from "src/shared/contracts/base-crud.repository";
+import { BaseCrudRepository } from "src/shared/application/ports/base-crud.repository";
 import { UserMapper } from "../mappers/user.mapper";
 import { UserOrmEntity } from "../orm-entities/user.orm-entity";
 import { User } from "../../domain/entities/user.entity";
-import { AbstractCacheService } from "src/shared/contracts/cache.service.abstract";
-import { CacheTTL } from "src/shared/contracts/cache-ttl";
+import { AbstractCacheService } from "src/shared/application/ports/cache.service.abstract";
+import { CacheTTL } from "src/shared/application/cache-ttl";
 
 @Injectable()
 export class UserRepository 
@@ -16,7 +16,7 @@ export class UserRepository
 {
   constructor(
     @InjectRepository(UserOrmEntity) private readonly userRepo: Repository<UserOrmEntity>,
-    cacheService?: AbstractCacheService 
+    cacheService: AbstractCacheService 
   ) {
     super(userRepo, {
       toDomain: UserMapper.toDomain,
@@ -47,5 +47,14 @@ export class UserRepository
       const ormUser = await this.repository.findOne({ where: { email } as any });
       return ormUser ? this.mapper.toDomain(ormUser) : null;
     });
+  }
+
+  protected async invalidateCacheById(id: string): Promise<void> {
+    await super.invalidateCacheById(id);
+
+    if (!this.cacheService) return;
+
+    const pattern = 'users:email:*';
+    await this.cacheService.invalidatePattern(pattern);
   }
 }

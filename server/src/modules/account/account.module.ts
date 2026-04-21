@@ -12,6 +12,7 @@ import { AccountController } from "./presentation/controllers/account.controller
 import { Module } from "@nestjs/common";
 import { AccountTypeRepository } from "./infrastructure/persistence/repositories/account-type.repository.impl";
 import { AccountRepository } from "./infrastructure/persistence/repositories/account.repository.impl";
+import { AccountTypeSeedService } from "./infrastructure/services/account-type-seed.service";
 
 
 @Module({
@@ -27,6 +28,7 @@ import { AccountRepository } from "./infrastructure/persistence/repositories/acc
     OpenAccountUseCase,
     GetAccountsUseCase,
     CloseAccountUseCase,
+    AccountTypeSeedService,
   ],
   exports: [AbstractAccountRepository],
 })

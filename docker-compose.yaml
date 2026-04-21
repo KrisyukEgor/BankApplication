@@ -25,6 +25,18 @@ services:
     volumes:
       - redis_data:/data 
 
+  mongodb:
+    image: mongo:6-jammy
+    container_name: bank_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: bank_db
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - bank_network
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: bank_pgadmin
@@ -44,7 +56,7 @@ services:
       dockerfile: Dockerfile
     container_name: bank_api
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - DB_HOST=postgres  
       - DB_PORT=5432
@@ -53,16 +65,18 @@ services:
       - DB_NAME=bank_app
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-
+      - MONGO_URI=mongodb://mongodb:27017/bank_db
     depends_on:
       - postgres
       - redis
+      - mongodb 
     networks:
       - bank_network
 
 volumes:
   postgres_data:
   redis_data:
+  mongo_data: 
 
 networks:
   bank_network:

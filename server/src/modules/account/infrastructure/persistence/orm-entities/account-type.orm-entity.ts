@@ -1,4 +1,4 @@
-import { BaseOrmEntity } from "src/shared/types/base-orm-entity";
+import { BaseOrmEntity } from "src/shared/domain/types/base-orm-entity";
 import { Entity, Column } from "typeorm";
 
 @Entity('account_types')

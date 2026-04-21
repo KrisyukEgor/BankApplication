@@ -22,7 +22,6 @@ export class AuthController {
     }
 
     const result = await this.registerUseCase.execute(inputDTO);
-
     return result;
   }
 
@@ -34,7 +33,6 @@ export class AuthController {
     }
 
     const result = await this.loginUseCase.execute(inputDto);
-
     return result;
   }
 }

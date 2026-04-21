@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { AbstractCacheService, CacheOptions } from '../contracts/cache.service.abstract';
+import { AbstractCacheService, CacheOptions } from '../application/ports/cache.service.abstract';
 
 @Injectable()
 export class RedisCacheService implements AbstractCacheService {

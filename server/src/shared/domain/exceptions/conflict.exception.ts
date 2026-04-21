@@ -1,4 +1,4 @@
-import { DomainException } from "src/shared/exceptions/domain.exception";
+import { DomainException } from "./domain.exception";
 
 export class ConflictException extends DomainException {
   constructor(message: string) {

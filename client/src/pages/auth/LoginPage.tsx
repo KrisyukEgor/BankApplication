@@ -22,8 +22,14 @@ export function LoginPage() {
         email,
         password,
       });
+
       setUser(user);
-      navigate("/");
+
+      if (user.role === "ADMIN") {
+        navigate("/admin/stats");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка входа");
     }

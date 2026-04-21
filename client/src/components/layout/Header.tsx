@@ -1,11 +1,8 @@
 import React from "react";
-import { useAuthStore } from "../../app/auth/useAuthStore";
 import { Link } from "react-router-dom";
-import { colors } from "../../styles/colors";
+import { useAuthStore } from "../../app/auth/useAuthStore";
+import { colors} from "../../styles/colors";
 import { theme } from "../../styles/Theme";
-
-
-
 
 export function Header() {
   const user = useAuthStore((state) => state.user);
@@ -19,7 +16,7 @@ export function Header() {
       }}
     >
       <Link
-        to="/"
+        to={user?.role === "ADMIN" ? "/admin/stats" : "/"}
         className="text-xl font-bold"
         style={{ color: colors.primaryDark }}
       >
@@ -29,33 +26,58 @@ export function Header() {
       {user && (
         <nav>
           <ul className="flex gap-6">
-            <li>
-              <Link
-                to="/profile"
-                className="text-sm font-medium hover:underline"
-                style={{ color: colors.gray800 }}
-              >
-                Профиль
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/accounts"
-                className="text-sm font-medium hover:underline"
-                style={{ color: colors.gray800 }}
-              >
-                Счета
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/transactions"
-                className="text-sm font-medium hover:underline"
-                style={{ color: colors.gray800 }}
-              >
-                Операции
-              </Link>
-            </li>
+            {user.role === "ADMIN" ? (
+              <>
+                <li>
+                  <Link
+                    to="/admin/stats"
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: colors.gray800 }}
+                  >
+                    Статистика
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/admin/logs"
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: colors.gray800 }}
+                  >
+                    Логи
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link
+                    to="/profile"
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: colors.gray800 }}
+                  >
+                    Профиль
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/accounts"
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: colors.gray800 }}
+                  >
+                    Счета
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/transactions"
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: colors.gray800 }}
+                  >
+                    Операции
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       )}

@@ -1,35 +1,32 @@
-// src/routes/index.tsx
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { ProtectedRoute } from "../components/ProtectedRoute";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "../components/layout/Layout";
-
-// pages
-import { LoginPage }from  "../pages/auth/LoginPage";
+import { ProtectedRoute } from "../components/ProtectedRoute";
+import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage";
 import { DashboardPage } from "../pages/dashboard/DashboardPage";
+import { TransactionsPage } from "../pages/dashboard/TransactionsPage";
+import { TransferPage } from "../pages/dashboard/TransferPage";
 
 export function AppRouter() {
   return (
     <Routes>
-      {/* Отдельно /auth/... */}
       <Route path="/auth/login" element={<LoginPage />} />
       <Route path="/auth/register" element={<RegisterPage />} />
       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-
-      {/* Все защищённые маршруты обернуты в Layout */}
+      <Route path="/transactions" element={<TransactionsPage />} />
+      <Route path="/transfer" element={<TransferPage />} />
       <Route
         element={
-          <ProtectedRoute allowedRoles={["USER", "WORKER", "ADMIN"]}>
+          <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardPage />} />
-        {/* можно добавить /profile, /accounts и т.д. — все в Layout */}
+        <Route path="/" element={<DashboardPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/auth/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

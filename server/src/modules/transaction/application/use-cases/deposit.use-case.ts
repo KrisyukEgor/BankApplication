@@ -58,8 +58,10 @@ export class DepositUseCase {
       });
 
     } catch (error) {
-      transaction.fail();
-      await this.transactionRepository.save(transaction);
+      if(transaction.isPending()) {
+        transaction.fail();
+        await this.transactionRepository.save(transaction);
+      }
 
       await this.logger.error('Deposit operation failed', error instanceof Error ? error.stack : undefined, 'deposit', {
         accountId: account.id,

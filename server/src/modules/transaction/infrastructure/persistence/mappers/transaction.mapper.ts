@@ -10,8 +10,8 @@ export class TransactionMapper {
       fromAccountId: orm.fromAccountId,
       toAccountId: orm.toAccountId,
       amount: Number(orm.amount),
-      typeId: orm.typeId,
-      statusId: orm.statusId,
+      typeCode: orm.typeCode,
+      statusCode: orm.statusCode,
       description: orm.description,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt,
@@ -25,8 +25,8 @@ export class TransactionMapper {
     orm.fromAccountId = domain.fromAccountId;
     orm.toAccountId = domain.toAccountId;
     orm.amount = domain.amount;
-    orm.typeId = domain.typeId;
-    orm.statusId = domain.statusId;
+    orm.typeCode = domain.typeCode;
+    orm.statusCode = domain.statusCode;
     orm.description = domain.description;
     return orm;
   }

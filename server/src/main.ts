@@ -8,6 +8,7 @@ import { ApiErrorResponse } from './shared/presentation/types/api-error-response
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationExceptionFilter } from './shared/presentation/filters/validation.exception-filter';
 import { DomainExceptionFilter } from './shared/presentation/filters/domain.exception-filter';
+import { AllExceptionsFilter } from './shared/presentation/filters/all-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,10 +31,14 @@ async function bootstrap() {
     }
   }));
 
-
   app.useGlobalInterceptors(new ApiSuccessInterceptor());
-  app.useGlobalFilters(new DomainExceptionFilter());
-  app.useGlobalFilters(new ValidationExceptionFilter());
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.enableCors({
+    origin: "*",
+    credentials: true,
+  })
 
   const config = new DocumentBuilder()
   .setTitle('Bank API')

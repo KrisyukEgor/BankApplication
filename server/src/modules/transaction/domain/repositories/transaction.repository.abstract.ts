@@ -3,6 +3,7 @@ import { TransactionDomain } from '../entities/transaction.entity';
 
 export abstract class AbstractTransactionRepository extends AbstractCrudRepository<TransactionDomain, string> {
   abstract findByPublicId(publicId: string): Promise<TransactionDomain | null>;
-  abstract findByAccountId(accountId: string, limit?: number, offset?: number): Promise<TransactionDomain[]>;
-  abstract findByCustomerId(customerId: string, limit?: number, offset?: number): Promise<TransactionDomain[]>;
+  abstract findByAccountId(accountId: string): Promise<TransactionDomain[]>;
+  abstract findByCustomerId(customerId: string): Promise<TransactionDomain[]>;
+  abstract findByAccountIds(accountIds: string[]): Promise<TransactionDomain[]>;
 }

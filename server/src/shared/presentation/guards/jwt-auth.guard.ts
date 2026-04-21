@@ -7,16 +7,13 @@ export class JwtAuthGuard implements CanActivate {
   constructor(private readonly tokenService: AbstractTokenService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    console.log('All headers:', request.headers);
-  console.log('Authorization header:', request.headers.authorization);
-  
+    const request = context.switchToHttp().getRequest();  
     const token = this.extractTokenFromHeader(request);
-    console.log('Token received:', token);
+    
     if (!token) throw new UnauthorizedException();
+
     try {
       const payload = await this.tokenService.verifyToken(token);
-      console.log('Payload:', payload);
       request.user = payload;
       return true;
     } catch (err) {

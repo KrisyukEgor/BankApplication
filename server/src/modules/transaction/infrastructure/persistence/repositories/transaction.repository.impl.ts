@@ -47,4 +47,13 @@ export class TransactionRepository
     const orms = await query.getMany();
     return orms.map(this.mapper.toDomain);
   }
+
+  async findByAccountIds(accountIds: string[]): Promise<TransactionDomain[]> {
+    if (!accountIds.length) return [];
+    const orms = await this.repository
+      .createQueryBuilder('tx')
+      .where('tx.fromAccountId IN (:...accountIds) OR tx.toAccountId IN (:...accountIds)', { accountIds })
+      .getMany();
+    return orms.map(this.mapper.toDomain);
+  }
 }

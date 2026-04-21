@@ -27,9 +27,7 @@ export class RegisterUseCase {
     await this.userService.ensureEmailUnique(inputDTO.email);
     const role = await this.roleService.getRoleByCode(ROLES_ENUM.USER);
     const hashedPassword = await this.passwordService.hash(inputDTO.password);
-    
-    console.log(role);
-    
+        
     const newUser = new User({
       id: uuidv4(),
       email: inputDTO.email,

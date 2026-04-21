@@ -35,8 +35,8 @@ export class CreateTransactionUseCase {
       fromAccountId: input.fromAccountId,
       toAccountId: input.toAccountId,
       amount: input.amount,
-      typeId: type.id,
-      statusId: status.id,
+      typeCode: type.code,
+      statusCode: status.code,
       description: input.description,
     });
 

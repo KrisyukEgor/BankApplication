@@ -46,53 +46,5 @@ export class ReportController {
     return this.reportService.getAnomalies();
   }
 
-  @Get('export')
-  @ApiOperation({ summary: 'Export any report to JSON or CSV' })
-  @ApiQuery({ name: 'type', enum: ['activity', 'top-active', 'distribution', 'trends', 'anomalies'] })
-  @ApiQuery({ name: 'format', enum: ['json', 'csv'], required: false })
-  async exportReport(
-    @Query('type') type: 'activity' | 'top-active' | 'distribution' | 'trends' | 'anomalies',
-    @Query('format') format: 'json' | 'csv' = 'json',
-    @Query('period') period?: 'day' | 'week' | 'month',
-    @Query('limit') limit?: number,
-    @Query('days') days?: number,
-    @Res() res?: Response, 
-  ) {
-    let data: any[];
-
-    switch (type) {
-      case 'activity':
-        data = await this.reportService.getUserActivityStats(period || 'day');
-        break;
-      case 'top-active':
-        data = await this.reportService.getTopActiveUsers(Number(limit) || 10);
-        break;
-      case 'distribution':
-        data = await this.reportService.getOperationDistribution();
-        break;
-      case 'trends':
-        data = await this.reportService.getTimeTrends(Number(days) || 7);
-        break;
-      case 'anomalies':
-        data = await this.reportService.getAnomalies();
-        break;
-      default:
-        throw new BadRequestException('Invalid report type');
-    }
-
-    if (format === 'csv' && res) {
-      try {
-        const parser = new Parser();
-        const csv = parser.parse(data);
-        
-        res.header('Content-Type', 'text/csv; charset=utf-8');
-        res.attachment(`report_${type}_${Date.now()}.csv`);
-        return res.send(csv);
-      } catch (err) {
-        throw new BadRequestException('Failed to generate CSV file');
-      }
-    } 
-    
-    return data; 
-  }
+  
 }

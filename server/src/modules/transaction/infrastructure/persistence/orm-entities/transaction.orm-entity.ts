@@ -17,11 +17,11 @@ export class TransactionOrmEntity extends BaseOrmEntity {
   @Column({ type: 'decimal', precision: 15, scale: 2 })
   amount: number;
 
-  @Column({ name: 'type_id' })
-  typeId: string;
+  @Column({ name: 'type_code' })
+  typeCode: string;
 
-  @Column({ name: 'status_id' })
-  statusId: string;
+  @Column({ name: 'status_code' })
+  statusCode: string;
 
   @Column({ nullable: true })
   description: string;

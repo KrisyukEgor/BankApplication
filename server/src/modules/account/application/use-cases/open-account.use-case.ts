@@ -23,7 +23,6 @@ export class OpenAccountUseCase {
     const userId = this.currentUser.getUserId();
     const customer = await this.customerRepository.findByUserId(userId);
 
-    console.log('input.typecode', input.typeCode);
     if (!customer) {
       await this.logger.warn('Open account failed: profile not found', 'account-management', userId);
       throw new ForbiddenException('Customer profile not found');

@@ -4,6 +4,8 @@ import { LogEntryDocument, LogEntrySchema } from 'src/shared/infrastructure/logg
 import { ReportService } from '../application/report.service';
 import { ReportController } from './report.controller';
 import { AuthModule } from 'src/modules/auth/auth.module';
+import { ExportController } from './export.controller';
+import { ExportService } from '../application/export.service';
 
 @Module({
   imports: [
@@ -12,8 +14,8 @@ import { AuthModule } from 'src/modules/auth/auth.module';
     ]),
     AuthModule,
   ],
-  controllers: [ReportController],
-  providers: [ReportService],
+  controllers: [ReportController, ExportController],
+  providers: [ReportService, ExportService],
   exports: [ReportService],
 })
 export class AnalyticsModule {}

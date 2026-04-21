@@ -9,6 +9,7 @@ import { DepositDto } from "../dto/request/deposit.dto";
 import { TransferDto } from "../dto/request/transfer.dto";
 import { WithdrawDto } from "../dto/request/withdraw.dto";
 import { WithdrawUseCase } from "../../application/use-cases/withdraw.use-case";
+import { GetTransactionsDto } from "../dto/request/get-transactions.dto";
 
 @ApiTags('transactions')
 @Controller('transactions')
@@ -41,11 +42,14 @@ export class TransactionController {
 
   @Get()
   async getTransactions(
-    @Query('accountId') accountId?: string,
-    @Query('customerId') customerId?: string,
-    @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
+    @Query() query: GetTransactionsDto, 
   ): Promise<TransactionOutput[]> {
-    return this.getTransactionsUseCase.execute({ accountId, customerId, limit, offset });
+    return this.getTransactionsUseCase.execute({
+      accountId: query.accountId,
+      fromDate: query.fromDate ? new Date(query.fromDate) : undefined,
+      toDate: query.toDate ? new Date(query.toDate) : undefined,
+      typeCode: query.typeCode,
+      statusCode: query.statusCode,
+    });
   }
 }

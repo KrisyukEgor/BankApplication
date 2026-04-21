@@ -23,8 +23,6 @@ export class LoginUseCase {
   async execute(inputDto: LoginInputDTO): Promise<LoginOutputDTO> {
     const { email, password } = inputDto;
 
-    console.log('input dto', inputDto);
-
     const isBlocked = await this.loginAttemptsRepo.isBlocked(email);
     if (isBlocked) {
       await this.logger.warn(`Blocked login attempt for ${email}`, 'auth');

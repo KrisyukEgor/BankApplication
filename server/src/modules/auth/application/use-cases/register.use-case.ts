@@ -8,10 +8,9 @@ import { UserService } from '../services/user.service';
 import { RoleService } from '../services/role.service';
 import { TokenGenerator } from '../services/token-generator.service';
 import { UserMapper } from '../mappers/user.mapper';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AuditLogEvent } from 'src/shared/common/autdit-log.event';
 import { User } from '../../domain/entities/user.entity';
 import {v4 as uuidv4} from 'uuid'
+import { AbstractLogger } from 'src/shared/application/ports/logger.abstract';
 
 @Injectable()
 export class RegisterUseCase {
@@ -20,15 +19,17 @@ export class RegisterUseCase {
     private readonly passwordService: AbstractPasswordService,
     private readonly userService: UserService,
     private readonly roleService: RoleService,
+    private readonly logger: AbstractLogger,
     private tokenService: TokenGenerator,
-    private eventEmitter: EventEmitter2
   ) {}
 
   async execute(inputDTO: RegisterInputDTO): Promise<RegisterOutputDTO> {
     await this.userService.ensureEmailUnique(inputDTO.email);
     const role = await this.roleService.getRoleByCode(ROLES_ENUM.USER);
     const hashedPassword = await this.passwordService.hash(inputDTO.password);
-
+    
+    console.log(role);
+    
     const newUser = new User({
       id: uuidv4(),
       email: inputDTO.email,
@@ -38,14 +39,14 @@ export class RegisterUseCase {
 
     const savedUser = await this.userRepository.save(newUser);
 
-    this.eventEmitter.emit(
-      'audit.log',
-      new AuditLogEvent(
-        'USER_REGISTERED',
-        savedUser.id,
-        {email: savedUser.email, role: role.code}
-      )
-    )
+    await this.logger.info(
+      `User registered: ${savedUser.email}`,
+      'auth',
+      savedUser.id,
+      { email: savedUser.email, role: role.code }
+    );
+
+
     const { accessToken, refreshToken } = await this.tokenService.getTokens(savedUser);
 
     return UserMapper.toRegisterOutputDTO(savedUser, accessToken, refreshToken);

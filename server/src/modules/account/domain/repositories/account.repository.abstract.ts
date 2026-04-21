@@ -1,4 +1,4 @@
-import { AbstractCrudRepository } from 'src/shared/types/base-crud.repository.abstract';
+import { AbstractCrudRepository } from 'src/shared/domain/types/base-crud.repository.abstract';
 import { Account } from '../entities/account.entity';
 
 export abstract class AbstractAccountRepository extends AbstractCrudRepository<Account, string> {

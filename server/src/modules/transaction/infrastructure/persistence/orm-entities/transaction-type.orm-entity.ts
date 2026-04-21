@@ -1,5 +1,5 @@
 import { Entity, Column } from 'typeorm';
-import { BaseOrmEntity } from 'src/shared/types/base-orm-entity';
+import { BaseOrmEntity } from 'src/shared/domain/types/base-orm-entity';
 
 @Entity('transaction_types')
 export class TransactionTypeOrmEntity extends BaseOrmEntity {

@@ -1,6 +1,6 @@
 import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
-import { IBaseEntity } from '../types/ibase.entity';
-import { AbstractCrudRepository } from '../types/base-crud.repository.abstract';
+import { IBaseEntity } from '../../domain/types/ibase.entity';
+import { AbstractCrudRepository } from '../../domain/types/base-crud.repository.abstract';
 import { AbstractCacheService } from './cache.service.abstract';
 
 export abstract class BaseCrudRepository<
@@ -40,7 +40,11 @@ export abstract class BaseCrudRepository<
     return this.repository.metadata.tableName;
   }
 
-  protected async withCache<T>(key: string | null, ttl: number, fn: () => Promise<T>) {
+  protected async withCache<T>(
+    key: string | null, 
+    ttl: number, 
+    fn: () => Promise<T>,
+  ): Promise<T> {
     if (!this.cacheService || !key) { 
       return fn();
     }
@@ -49,10 +53,9 @@ export abstract class BaseCrudRepository<
       const cached = await this.cacheService.get<T>(key);
       
       if (cached !== null && cached !== undefined) {
-        return cached;
+        return this.deserialize(cached) as T;
       }
-    } 
-    catch (error) {
+    } catch (error) {
       console.error(`[Cache Error] GET ${key}:`, error);
     }
 
@@ -60,15 +63,28 @@ export abstract class BaseCrudRepository<
 
     try {
       if (result !== null && result !== undefined) {
-        await this.cacheService.set(key, result, { ttl });
+        const dataToStore = this.serialize(result as unknown as Domain | Domain[]);
+        await this.cacheService.set(key, dataToStore, { ttl });
       }
-
-    } 
-    catch (error) {
+    } catch (error) {
       console.error(`[Cache Error] SET ${key}:`, error);
     }
 
     return result;
+  }
+
+  protected serialize(data: Domain | Domain[]): any {
+    if (Array.isArray(data)) {
+      return data.map(item => (item as any).props || item);
+    }
+    return (data as any).props || data;
+  }
+
+  protected deserialize(data: any): Domain | Domain[] {
+    if (Array.isArray(data)) {
+      return data.map(item => this.mapper.toDomain(item));
+    }
+    return this.mapper.toDomain(data);
   }
 
   async findById(id: IdType): Promise<Domain | null> {

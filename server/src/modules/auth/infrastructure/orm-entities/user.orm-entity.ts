@@ -1,4 +1,4 @@
-import { BaseOrmEntity } from 'src/shared/types/base-orm-entity';
+import { BaseOrmEntity } from 'src/shared/domain/types/base-orm-entity';
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { RoleOrmEntity } from './role.orm-entity';
 

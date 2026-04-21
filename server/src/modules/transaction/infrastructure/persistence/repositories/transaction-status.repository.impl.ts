@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BaseCrudRepository } from 'src/shared/contracts/base-crud.repository';
+import { BaseCrudRepository } from 'src/shared/application/ports/base-crud.repository';
 import { AbstractTransactionStatusRepository } from '../../../domain/repositories/transaction-status.repository.abstract';
 import { TransactionStatus } from '../../../domain/entities/transaction-status.entity';
 import { TransactionStatusOrmEntity } from '../orm-entities/transaction-status.orm-entity';
 import { TransactionStatusMapper } from '../mappers/transaction-status.mapper';
-import { CacheTTL } from 'src/shared/contracts/cache-ttl';
+import { CacheTTL } from 'src/shared/application/cache-ttl';
 
 @Injectable()
 export class TransactionStatusRepository

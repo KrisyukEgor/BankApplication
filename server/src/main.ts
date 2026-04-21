@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { EnvConfigService } from './config/services/env.config';
-import { DomainExceptionFilter } from './shared/common/filters/domain.exception-filter';
-import { ApiSuccessInterceptor } from './shared/common/interceptors/api-success.interceptor';
+import { ApiSuccessInterceptor } from './shared/presentation/interceptors/api-success.interceptor';
 import { HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
-import { ValidationExceptionFilter } from './shared/common/filters/validation.exception-filter';
 import { ValidationError } from 'class-validator';
-import { ApiErrorResponse } from './shared/common/types/api-error-response.type';
+import { ApiErrorResponse } from './shared/presentation/types/api-error-response.type';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationExceptionFilter } from './shared/presentation/filters/validation.exception-filter';
+import { DomainExceptionFilter } from './shared/presentation/filters/domain.exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

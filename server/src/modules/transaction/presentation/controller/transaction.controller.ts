@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { JwtAuth } from "src/shared/common/decorators/jwt-auth.decorator";
+import { JwtAuth } from "src/shared/presentation/decorators/jwt-auth.decorator";
 import { TransactionOutput } from "../../application/dto/output/transaction.output.dto";
 import { DepositUseCase } from "../../application/use-cases/deposit.use-case";
 import { GetTransactionsUseCase } from "../../application/use-cases/get-transactions.use-case";

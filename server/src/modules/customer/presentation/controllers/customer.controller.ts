@@ -1,6 +1,6 @@
 import { Controller, UseGuards, Post, Body, Get, Param, Put, Delete, HttpCode, HttpStatus } from "@nestjs/common";
 import { ROLES_ENUM } from "src/modules/auth/domain/entities/role.entity";
-import { Roles } from "src/shared/common/decorators/roles.decorators";
+import { Roles } from "src/shared/presentation/decorators/roles.decorators";
 import { CustomerOutput } from "../../application/dto/output/create-customer.output.dto";
 import { CreateCustomerUseCase } from "../../application/use-cases/create-customer.use-case";
 import { DeleteCustomerUseCase } from "../../application/use-cases/delete-customer.use-case";
@@ -9,8 +9,8 @@ import { UpdateCustomerUseCase } from "../../application/use-cases/update-custom
 import { CreateCustomerDto } from "../dto/request/create-customer.dto";
 import { CustomerIdParamDto } from "../dto/request/customer-id.param.dto";
 import { UpdateCustomerDto } from "../dto/request/update-customer.dto";
-import { RolesGuard } from "src/shared/common/guards/roles.guard";
-import { JwtAuth } from "src/shared/common/decorators/jwt-auth.decorator";
+import { RolesGuard } from "src/shared/presentation/guards/roles.guard";
+import { JwtAuth } from "src/shared/presentation/decorators/jwt-auth.decorator";
 
 @Controller('customers')
 @JwtAuth()

@@ -1,9 +1,9 @@
 import { Controller, Post, Body, Get, Param, NotFoundException, HttpCode, HttpStatus, Delete, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { ROLES_ENUM } from "src/modules/auth/domain/entities/role.entity";
-import { JwtAuth } from "src/shared/common/decorators/jwt-auth.decorator";
-import { Roles } from "src/shared/common/decorators/roles.decorators";
-import { RolesGuard } from "src/shared/common/guards/roles.guard";
+import { JwtAuth } from "src/shared/presentation/decorators/jwt-auth.decorator";
+import { Roles } from "src/shared/presentation/decorators/roles.decorators";
+import { RolesGuard } from "src/shared/presentation/guards/roles.guard";
 import { AccountOutput } from "../../application/dto/output/account.output.dto";
 import { CloseAccountUseCase } from "../../application/use-cases/close-account.use-case";
 import { GetAccountsUseCase } from "../../application/use-cases/get-accounts.use-case";

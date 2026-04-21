@@ -1,5 +1,5 @@
 import { Injectable, ForbiddenException, BadRequestException } from "@nestjs/common";
-import { AbstractCurrentUserService } from "src/shared/services/current-user.service";
+import { AbstractCurrentUserService } from "src/shared/application/ports/current-user.service";
 import { AbstractCustomerRepository } from "src/modules/customer/domain/repositories/customer.repository.abstract";
 import { AccountType } from "../../domain/entities/account-type.entity";
 import { Account } from "../../domain/entities/account.entity";
@@ -7,7 +7,7 @@ import { AbstractAccountTypeRepository } from "../../domain/repositories/account
 import { AbstractAccountRepository } from "../../domain/repositories/account.repository.abstract";
 import { CreateAccountInput } from "../dto/input/create-account.input.dto";
 import { AccountOutput } from "../dto/output/account.output.dto";
-
+import { AbstractLogger } from "src/shared/application/ports/logger.abstract"; 
 
 @Injectable()
 export class OpenAccountUseCase {
@@ -16,15 +16,24 @@ export class OpenAccountUseCase {
     private readonly accountTypeRepository: AbstractAccountTypeRepository,
     private readonly customerRepository: AbstractCustomerRepository,
     private readonly currentUser: AbstractCurrentUserService,
+    private readonly logger: AbstractLogger, 
   ) {}
 
   async execute(input: CreateAccountInput): Promise<AccountOutput> {
     const userId = this.currentUser.getUserId();
     const customer = await this.customerRepository.findByUserId(userId);
-    if (!customer) throw new ForbiddenException('Customer profile not found');
+
+    console.log('input.typecode', input.typeCode);
+    if (!customer) {
+      await this.logger.warn('Open account failed: profile not found', 'account-management', userId);
+      throw new ForbiddenException('Customer profile not found');
+    }
 
     const accountType = await this.accountTypeRepository.findByCode(input.typeCode);
-    if (!accountType) throw new BadRequestException('Invalid account type');
+    if (!accountType) {
+      await this.logger.warn('Open account failed: invalid type', 'account-management', userId, { typeCode: input.typeCode });
+      throw new BadRequestException('Invalid account type');
+    }
 
     const accountNumber = this.generateAccountNumber();
 
@@ -37,6 +46,13 @@ export class OpenAccountUseCase {
     });
 
     const saved = await this.accountRepository.save(account);
+
+    await this.logger.info('Account opened successfully', 'account-management', userId, {
+      openedAccountId: saved.id,
+      accountNumber: saved.number,
+      type: accountType.code
+    });
+
     return this.toOutput(saved, accountType);
   }
 

@@ -20,13 +20,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserOrmEntity } from './infrastructure/orm-entities/user.orm-entity';
 import { RoleOrmEntity } from './infrastructure/orm-entities/role.orm-entity';
 import { RoleDbSeedService } from './infrastructure/persistence/role-db-seed.service';
-import { JwtAuthGuard } from 'src/shared/common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/shared/presentation/guards/jwt-auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AbstractCurrentUserService } from '../../shared/services/current-user.service';
+import { AbstractCurrentUserService } from '../../shared/application/ports/current-user.service';
 import { CurrentUserServiceImpl } from './infrastructure/services/current-user-impl.service';
 import { AbstractLoginAttemptsRepository } from './application/ports/login-attempts.repository.abstract';
 import { RedisLoginAttemptsRepository } from './infrastructure/services/redis-login-attempts.repository';
-import { RedisCacheModule } from 'src/config/modules/cache/cache.module';
+import { RedisCacheModule } from 'src/config/modules/cache/redis.module';
 
 
 @Module({

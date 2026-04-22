@@ -41,7 +41,7 @@
     "ioredis": "^5.10.1",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.4.1",
+    "mongoose": "^9.5.0",
     "nest-winston": "^1.10.2",
     "node-pg-migrate": "^8.0.4",
     "passport": "^0.7.0",

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsOptional, Length, Matches } from 'class-validator';
 
 export class CreateCustomerDto {
@@ -16,6 +17,9 @@ export class CreateCustomerDto {
   @Length(0, 50)
   middleName?: string;
 
+  @ApiProperty({
+    example: '+37525444444444'
+  })
   @IsString()
   @IsNotEmpty()
   @Matches(/^\+?[0-9]{10,15}$/, { message: 'Invalid phone number format' })

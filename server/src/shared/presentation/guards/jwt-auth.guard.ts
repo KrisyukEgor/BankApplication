@@ -1,5 +1,4 @@
 import { Injectable, ExecutionContext, UnauthorizedException, CanActivate } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { AbstractTokenService } from 'src/modules/auth/application/ports/token.service.abstract';
 
 @Injectable()

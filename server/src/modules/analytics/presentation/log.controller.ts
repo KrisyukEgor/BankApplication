@@ -10,8 +10,8 @@ import { LogFilterDto } from './dto/log-filter.dto';
 
 @ApiTags('logs')
 @Controller('logs')
-@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(ROLES_ENUM.ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class LogController {
   constructor(private readonly logQueryService: LogQueryService) {}

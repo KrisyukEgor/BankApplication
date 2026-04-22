@@ -13,7 +13,7 @@ export interface RoleProps {
 export class Role {
   private props: RoleProps;
 
-  constructor(props) {
+  constructor(props: RoleProps) {
     this.props = {
       ...props
     }

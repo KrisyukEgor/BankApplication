@@ -8,6 +8,7 @@ import { UserOrmEntity } from "../orm-entities/user.orm-entity";
 import { User } from "../../domain/entities/user.entity";
 import { AbstractCacheService } from "src/shared/application/ports/cache.service.abstract";
 import { CacheTTL } from "src/shared/application/cache-ttl";
+import { Role } from "../../domain/entities/role.entity";
 
 @Injectable()
 export class UserRepository 
@@ -40,14 +41,55 @@ export class UserRepository
     return CacheTTL.USER_LIST;
   }
 
+  protected serialize(domain: User): any {
+    return {
+      id: domain.id,
+      email: domain.email,
+      passwordHash: domain.passwordHash,
+      roleId: domain.roleId,
+      role: domain.role ? {
+        id: domain.role.id,
+        code: domain.role.code,
+        name: domain.role.name,
+      } : null,
+      createdAt: domain.createdAt.toISOString(),
+      updatedAt: domain.updatedAt.toISOString(),
+    };
+  }
+
+  protected deserialize(data: any): User {
+    const role = data.role ? new Role({
+      id: data.role.id,
+      code: data.role.code,
+      name: data.role.name,
+    }) : undefined;
+    return new User({
+      id: data.id,
+      email: data.email,
+      passwordHash: data.passwordHash,
+      roleId: data.roleId,
+      role,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const cacheKey = `users:email:${email}`;
     
     return this.withCache(cacheKey, CacheTTL.USER_SINGLE, async () => {
-      const ormUser = await this.repository.findOne({ where: { email } as any });
+      const ormUser = await this.repository.findOne({ 
+        where: { email } as any,
+        relations: ['role']
+      });
       return ormUser ? this.mapper.toDomain(ormUser) : null;
     });
   }
+
+  // async findByEmail(email: string): Promise<User | null> {
+  //   const ormUser = await this.repository.findOne({ where: { email } as any, relations: ['role'] });
+  //   return ormUser ? this.mapper.toDomain(ormUser) : null;
+  // }
 
   protected async invalidateCacheById(id: string): Promise<void> {
     await super.invalidateCacheById(id);

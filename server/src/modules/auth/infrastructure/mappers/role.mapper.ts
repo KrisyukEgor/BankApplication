@@ -3,6 +3,7 @@ import { RoleOrmEntity } from '../orm-entities/role.orm-entity';
 
 export class RoleMapper {
   static toDomain(orm: RoleOrmEntity): Role {
+
     return new Role({
       id: orm.id,
       code: orm.code,

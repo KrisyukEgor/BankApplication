@@ -11,6 +11,7 @@ import { CustomerIdParamDto } from "../dto/request/customer-id.param.dto";
 import { UpdateCustomerDto } from "../dto/request/update-customer.dto";
 import { RolesGuard } from "src/shared/presentation/guards/roles.guard";
 import { JwtAuth } from "src/shared/presentation/decorators/jwt-auth.decorator";
+import { AuthRoles } from "src/shared/presentation/decorators/auth.roles.decorator";
 
 @Controller('customers')
 @JwtAuth()
@@ -44,15 +45,13 @@ export class CustomerController {
   }
 
   @Get(':id')
-  @Roles(ROLES_ENUM.ADMIN, ROLES_ENUM.WORKER)
-  @UseGuards(RolesGuard)
+  @AuthRoles(ROLES_ENUM.ADMIN, ROLES_ENUM.WORKER)
   async getCustomerById(@Param() params: CustomerIdParamDto): Promise<CustomerOutput> {
     return this.getCustomerUseCase.execute(params.id);
   }
 
   @Put(':id')
-  @Roles(ROLES_ENUM.ADMIN, ROLES_ENUM.WORKER)
-  @UseGuards(RolesGuard)
+  @AuthRoles(ROLES_ENUM.ADMIN, ROLES_ENUM.WORKER)
   async updateCustomerById(
     @Param() params: CustomerIdParamDto,
     @Body() input: UpdateCustomerDto,
@@ -61,8 +60,7 @@ export class CustomerController {
   }
 
   @Delete(':id')
-  @Roles(ROLES_ENUM.ADMIN)
-  @UseGuards(RolesGuard)
+  @AuthRoles(ROLES_ENUM.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCustomerById(@Param() params: CustomerIdParamDto): Promise<void> {
     return this.deleteCustomerUseCase.execute(params.id);

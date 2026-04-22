@@ -2,16 +2,13 @@ import { Controller, Post, Body, Get, Param, NotFoundException, HttpCode, HttpSt
 import { ApiTags } from "@nestjs/swagger";
 import { ROLES_ENUM } from "src/modules/auth/domain/entities/role.entity";
 import { JwtAuth } from "src/shared/presentation/decorators/jwt-auth.decorator";
-import { Roles } from "src/shared/presentation/decorators/roles.decorators";
-import { RolesGuard } from "src/shared/presentation/guards/roles.guard";
 import { AccountOutput } from "../../application/dto/output/account.output.dto";
 import { CloseAccountUseCase } from "../../application/use-cases/close-account.use-case";
 import { GetAccountsUseCase } from "../../application/use-cases/get-accounts.use-case";
 import { OpenAccountUseCase } from "../../application/use-cases/open-account.use-case";
 import { AccountIdParamDto } from "../dto/param/account-id.param.dto";
 import { CreateAccountDto } from "../dto/request/create-account.request.dto";
-import { DepositWithdrawDto } from "../dto/request/deposit-withdraw.dto";
-import { TransferDto } from "../dto/request/transfer.dto";
+import { AuthRoles } from "src/shared/presentation/decorators/auth.roles.decorator";
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -48,8 +45,7 @@ export class AccountController {
   }
 
   @Get('customer/:customerId')
-  @Roles(ROLES_ENUM.ADMIN, ROLES_ENUM.WORKER)
-  @UseGuards(RolesGuard)
+  @AuthRoles(ROLES_ENUM.ADMIN, ROLES_ENUM.WORKER)
   async getAccountsByCustomer(@Param('customerId') customerId: string): Promise<AccountOutput[]> {
     return this.getAccountsUseCase.execute(customerId);
   }

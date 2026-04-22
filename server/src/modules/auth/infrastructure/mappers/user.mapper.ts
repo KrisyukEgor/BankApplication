@@ -1,13 +1,16 @@
 import { User } from "../../domain/entities/user.entity";
 import { UserOrmEntity } from "../orm-entities/user.orm-entity";
+import { RoleMapper } from "./role.mapper";
 
 export class UserMapper {
   static toDomain(ormEntity: UserOrmEntity): User {
+
     return new User({
       id: ormEntity.id,
       email: ormEntity.email,
       passwordHash: ormEntity.passwordHash,
       roleId: ormEntity.roleId,
+      role: ormEntity.role ? RoleMapper.toDomain(ormEntity.role) : undefined,
       createdAt: ormEntity.createdAt,
       updatedAt: ormEntity.updatedAt,
     });

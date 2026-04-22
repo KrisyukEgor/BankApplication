@@ -27,6 +27,7 @@ import { CurrentUserServiceImpl } from './infrastructure/services/current-user-i
 import { AbstractLoginAttemptsRepository } from './application/ports/login-attempts.repository.abstract';
 import { RedisLoginAttemptsRepository } from './infrastructure/services/redis-login-attempts.repository';
 import { RedisCacheModule } from 'src/config/modules/cache/redis.module';
+import { AdminSeedService } from './infrastructure/services/admin-seed.service';
 
 
 @Module({
@@ -61,6 +62,7 @@ import { RedisCacheModule } from 'src/config/modules/cache/redis.module';
     { provide: AbstractTokenService, useClass: JwtTokenService},
     { provide: AbstractCurrentUserService, useClass: CurrentUserServiceImpl },
     JwtAuthGuard,
+    AdminSeedService,
   ],
   exports: [
     AbstractTokenService, 

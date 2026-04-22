@@ -36,7 +36,8 @@ import { RedisCacheModule } from 'src/config/modules/cache/redis.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
+        
+        secret: process.env.JWT_SECRET,
         signOptions: { expiresIn: '1d' },
       }),
       inject: [ConfigService],

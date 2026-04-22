@@ -13,42 +13,52 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const envConfig = app.get(EnvConfigService);
 
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    exceptionFactory: (validationErrors: ValidationError[]) => {
-      const messages = validationErrors.map(error => {
-        return Object.values(error.constraints!).join(', ');
-      }).join('; ');
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
 
-      const customErrorResponse: ApiErrorResponse = {
-        success: false, 
-        message: `Ошибка валидации: ${messages}`,
-        statusCode: HttpStatus.BAD_REQUEST, 
-      };
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory: (validationErrors: ValidationError[]) => {
+        const messages = validationErrors
+          .map((error) => {
+            return Object.values(error.constraints!).join(', ');
+          })
+          .join('; ');
 
-      throw new HttpException(customErrorResponse, HttpStatus.BAD_REQUEST);
-    }
-  }));
+        const customErrorResponse: ApiErrorResponse = {
+          success: false,
+          message: `Ошибка валидации: ${messages}`,
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
 
+        throw new HttpException(customErrorResponse, HttpStatus.BAD_REQUEST);
+      },
+    }),
+  );
 
   app.useGlobalInterceptors(new ApiSuccessInterceptor());
   app.useGlobalFilters(new DomainExceptionFilter());
   app.useGlobalFilters(new ValidationExceptionFilter());
 
   const config = new DocumentBuilder()
-  .setTitle('Bank API')
-  .setDescription('Bank application API')
-  .setVersion('1.0')
-  .addBearerAuth()
-  .build();
+    .setTitle('Bank API')
+    .setDescription('Bank application API')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
-      persistAuthorization: true, 
+      persistAuthorization: true,
     },
   });
-  
+
   await app.listen(envConfig.port);
   console.log(`Server running on http://localhost:${envConfig.port}`);
 }

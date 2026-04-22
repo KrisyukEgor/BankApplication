@@ -25,8 +25,11 @@ export class RegisterUseCase {
 
   async execute(inputDTO: RegisterInputDTO): Promise<RegisterOutputDTO> {
     await this.userService.ensureEmailUnique(inputDTO.email);
+    console.log('1 unique checked');
     const role = await this.roleService.getRoleByCode(ROLES_ENUM.USER);
+    console.log('2 role', role);
     const hashedPassword = await this.passwordService.hash(inputDTO.password);
+    console.log('3 hashed');
     
     console.log(role);
     
@@ -38,6 +41,7 @@ export class RegisterUseCase {
     });
 
     const savedUser = await this.userRepository.save(newUser);
+     console.log('4 savedUser', savedUser);
 
     await this.logger.info(
       `User registered: ${savedUser.email}`,
@@ -45,9 +49,11 @@ export class RegisterUseCase {
       savedUser.id,
       { email: savedUser.email, role: role.code }
     );
+    console.log('5 logger ok');
 
 
     const { accessToken, refreshToken } = await this.tokenService.getTokens(savedUser);
+    console.log('6 tokens ok');
 
     return UserMapper.toRegisterOutputDTO(savedUser, accessToken, refreshToken);
   }

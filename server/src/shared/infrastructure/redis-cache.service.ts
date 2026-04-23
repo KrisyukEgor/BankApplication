@@ -1,13 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { AbstractCacheService, CacheOptions } from '../application/ports/cache.service.abstract';
 
 @Injectable()
-export class RedisCacheService implements AbstractCacheService {
+export class RedisCacheService implements AbstractCacheService, OnModuleDestroy {
+
+  private publisher: Redis;
+  private subscriber: Redis;
 
   constructor(
     @Inject('REDIS_CLIENT') private readonly redis: Redis
-  ) {}
+  ) {
+    
+    const redisOptions = this.redis.options;
+
+    this.publisher = new Redis(redisOptions);
+    this.subscriber = new Redis(redisOptions);
+  }
   
   async get<T>(key: string): Promise<T | null> {
     const data = await this.redis.get(key);
@@ -41,6 +50,32 @@ export class RedisCacheService implements AbstractCacheService {
       if(keys.length > 0) {
         await this.redis.del(...keys);
       }
+    }
+  }
+
+  async publish(channel: string, message: any): Promise<void> {
+    const payload = JSON.stringify(message);
+    await this.publisher.publish(channel, payload);
+  }
+
+  async subscribe(channel: string, callback: (message: any) => void): Promise<void> {
+    await this.subscriber.subscribe(channel);
+    this.subscriber.on('message', (chan, message) => {
+      if (chan === channel) {
+        callback(JSON.parse(message));
+      }
+    });
+  }
+
+  async onModuleDestroy() {
+    try {
+      await Promise.all([
+        this.publisher.quit(),
+        this.subscriber.quit()
+      ]);
+      console.log('Redis Pub/Sub connections closed');
+    } catch (error) {
+      console.error('Error closing Redis connections:', error);
     }
   }
 }

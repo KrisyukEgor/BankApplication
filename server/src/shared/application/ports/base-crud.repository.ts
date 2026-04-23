@@ -112,8 +112,15 @@ export abstract class BaseCrudRepository<
 
   async save(domain: Domain): Promise<Domain> {
     const saved = await this.performSave(domain);
-
     await this.invalidateCacheById(saved.id); 
+
+    if (this.cacheService) {
+      await this.cacheService.publish(`${this.getCachePrefix()}_changed`, {
+        type: 'SAVE',
+        id: saved.id,
+        entity: this.getCachePrefix()
+      });
+    }
 
     return saved;
   }

@@ -18,7 +18,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         
         autoLoadEntities: true,
         synchronize: true, 
-        logging: true,
+        logging: false,
         
         ssl: false, 
       }),

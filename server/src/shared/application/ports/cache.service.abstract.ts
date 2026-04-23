@@ -7,4 +7,7 @@ export abstract class AbstractCacheService {
   abstract set(key: string, value: any, options?: CacheOptions): Promise<void>;
   abstract del(key: string): Promise<void>;
   abstract invalidatePattern(pattern: string): Promise<void>;
+
+  abstract publish(channel: string, message: any): Promise<void>;
+  abstract subscribe(channel: string, callback: (message: any) => void): Promise<void>;
 }

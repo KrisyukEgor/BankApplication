@@ -10,6 +10,7 @@ import { RedisCacheModule } from './config/modules/cache/redis.module';
 import { LoggingModule } from './config/modules/logging.module';
 import { MongoDatabaseModule } from './config/modules/db/mongo.module';
 import { AnalyticsModule } from './modules/analytics/presentation/analytics.module';
+import { NotificationService } from './shared/infrastructure/notifications.service';
 
 @Module({
   imports: [
@@ -28,5 +29,8 @@ import { AnalyticsModule } from './modules/analytics/presentation/analytics.modu
     AnalyticsModule,
     // LoanModule,
   ],
+  providers: [
+    NotificationService
+  ]
 })
 export class AppModule {}
